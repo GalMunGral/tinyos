@@ -14,3 +14,4 @@ typedef __SIZE_TYPE__    size_t;
 typedef _Bool            bool;
 #define true  1
 #define false 0
+#define NULL  ((void *)0)

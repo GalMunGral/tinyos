@@ -3,6 +3,17 @@
 #include "trap.h"
 #include "mm.h"
 #include "vm.h"
+#include "proc.h"
+
+static void proc_a(void) {
+    for (;;)
+        kprintf("A\n");
+}
+
+static void proc_b(void) {
+    for (;;)
+        kprintf("B\n");
+}
 
 void kmain(void) {
     uart_init();
@@ -10,8 +21,8 @@ void kmain(void) {
     trap_init();
     kprintf("trap ok\n");
     mm_init();
-    kprintf("vm: sv39 on, kernel at 0x%x\n", KERNEL_OFFSET);
-
-    for (;;)
-        __asm__ volatile("wfi");
+    kprintf("mm ok\n");
+    proc_alloc(proc_a);
+    proc_alloc(proc_b);
+    scheduler();
 }

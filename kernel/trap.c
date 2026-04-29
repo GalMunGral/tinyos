@@ -1,4 +1,5 @@
 #include "trap.h"
+#include "proc.h"
 #include "kprintf.h"
 
 #define SCAUSE_INTR   (1UL << 63)
@@ -39,7 +40,9 @@ void trap_handler(struct trapframe *tf) {
 
     if (is_intr && code == CAUSE_TIMER) {
         timer_ack();
-        return;  // yield() goes here in #8
+        if (current_proc)
+            yield();
+        return;
     }
 
     kpanic("trap: scause=%x stval=%x epc=%x\n", scause, stval, tf->epc);
