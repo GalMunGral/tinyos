@@ -1,6 +1,6 @@
 #include "uart.h"
 
-#define UART_BASE 0x10000000UL
+#define UART_BASE 0xFFFFFFC010000000UL  // PA 0x10000000 + KERNEL_OFFSET
 
 #define RBR 0  // receive buffer   (DLAB=0, read)
 #define THR 0  // transmit holding (DLAB=0, write)

@@ -42,6 +42,8 @@ target_link_options(kernel.elf PRIVATE
     -Wl,--build-id=none
 )
 
+set_target_properties(kernel.elf PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
+
 # QEMU
 set(QEMU_BASE
     qemu-system-riscv64

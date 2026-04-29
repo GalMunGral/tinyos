@@ -1,8 +1,9 @@
 #include "mm.h"
+#include "vm.h"
 #include "kprintf.h"
 
 #define PAGE_SIZE 4096
-#define RAM_END   0x88000000UL  // 128MB at 0x80000000
+#define RAM_END   (KERNEL_OFFSET + 0x88000000UL)  // high VA of end of 128 MB RAM
 
 extern char __kernel_end[];
 
