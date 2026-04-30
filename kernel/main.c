@@ -22,6 +22,7 @@ void kmain(void) {
     kprintf("trap ok\n");
     mm_init();
     kprintf("mm ok\n");
+    proc_init();
     proc_alloc(proc_a);
     proc_alloc(proc_b);
     scheduler();

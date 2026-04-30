@@ -48,10 +48,10 @@ void trap_handler(struct trapframe *tf) {
     kpanic("trap: scause=%x stval=%x epc=%x\n", scause, stval, tf->epc);
 }
 
-extern void trap_entry(void);
+extern void kernel_trap_entry(void);
 
 void trap_init(void) {
-    __asm__ volatile("csrw stvec, %0"  :: "r"(trap_entry));  // set trap vector
+    __asm__ volatile("csrw stvec, %0"  :: "r"(kernel_trap_entry));  // set trap vector
     __asm__ volatile("csrs sie, %0"    :: "r"(1 << 5));      // enable supervisor timer interrupt
     timer_ack();                                              // arm the first timer
     __asm__ volatile("csrs sstatus, %0" :: "r"(1 << 1));     // enable global interrupts (SIE)

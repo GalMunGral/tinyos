@@ -14,13 +14,17 @@
 #define PTE_D  (1UL << 7)   // dirty
 
 typedef uint64_t  pte_t;
-typedef pte_t    *pagetable_t;   // one page = 512 pte_t entries
 
 static inline uint64_t    pa2pte(uint64_t pa) { return (pa >> 12) << 10; }
 static inline uint64_t    pte2pa(pte_t pte)   { return (pte >> 10) << 12; }
 static inline void       *pa_to_va(uint64_t pa) { return (void *)(pa + KERNEL_OFFSET); }
 static inline uint64_t    va_to_pa(void *va)    { return (uint64_t)va - KERNEL_OFFSET; }
 
-pagetable_t vm_new_table(void);
-void        map_page(pagetable_t pt, uint64_t va, uint64_t pa, uint64_t flags);
-void        unmap_page(pagetable_t pt, uint64_t va);
+static inline uint64_t pt_to_satp(pte_t *pt) { return (8UL << 60) | (va_to_pa(pt) >> 12); }
+
+static inline void w_satp(uint64_t satp) { __asm__ volatile("csrw satp, %0" :: "r"(satp)); }
+static inline void sfence_vma(void)      { __asm__ volatile("sfence.vma zero, zero" ::: "memory"); }
+
+pte_t      *vm_new_table(void);
+void        map_page(pte_t *pt, uint64_t va, uint64_t pa, uint64_t flags);
+void        unmap_page(pte_t *pt, uint64_t va);

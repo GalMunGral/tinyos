@@ -2,7 +2,7 @@
 
 .section .text.entry
 .global _start
-.global _high_start
+.global _start_virtual
 
 _start:
     bnez    a0, .halt               # only hart 0 boots
@@ -15,8 +15,8 @@ _start:
     addi    t0, t0, 8
     j       1b
 
-2:  # Build boot page table (BSS is now zeroed; la gives PA)
-    la      t0, boot_pagetable
+2:  # Build default page table (BSS is now zeroed; la gives PA)
+    la      t0, default_pagetable
 
     # root[2]:   VA 0x80000000         -> PA 0x80000000  (identity, R/W/X; needed until jump to high VA)
     # root[258]: VA 0xFFFFFFC080000000 -> PA 0x80000000  (kernel,   R/W/X)
@@ -36,7 +36,7 @@ _start:
     add     t2, t0, t2
     sd      t1, 0(t2)
 
-    # Enable Sv39: satp = (8<<60) | PPN-of-boot_pagetable
+    # Enable Sv39: satp = (8<<60) | PPN-of-default_pagetable
     srli    t1, t0, 12
     li      t2, 8
     slli    t2, t2, 60
@@ -45,12 +45,12 @@ _start:
     sfence.vma zero, zero
 
     # la gives PA here (PC is still identity-mapped); add KERNEL_OFFSET for VA
-    la      t0, _high_start
+    la      t0, _start_virtual
     li      t1, KERNEL_OFFSET
     add     t0, t0, t1
     jalr    zero, t0, 0             # absolute jump to high VA
 
-_high_start:
+_start_virtual:
     la      sp, _stack_top          # la now gives VA
     call    kmain
 
@@ -60,7 +60,8 @@ _high_start:
 
 .section .bss
 .align 12                           # 4 KB page-aligned
-boot_pagetable:
+.global default_pagetable
+default_pagetable:
 .space 4096                         # 512 x 8-byte PTEs
 
 .align 4                            # 16-byte stack alignment (RISC-V ABI)

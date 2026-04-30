@@ -40,3 +40,5 @@ struct trapframe {
 
 void trap_init(void);
 void trap_handler(struct trapframe *tf);
+void proc_entry(void);
+void trap_return(void);

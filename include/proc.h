@@ -1,6 +1,7 @@
 #pragma once
 
 #include "types.h"
+#include "mm.h"
 #include "vm.h"
 #include "trap.h"
 
@@ -15,17 +16,19 @@ enum proc_state { RUNNABLE, EXITED };
 
 struct proc {
     enum proc_state       state;
-    pagetable_t           pagetable;
+    uint64_t              satp;
+    pte_t                *pagetable;
     struct switch_context ctx;
 };
 
 static inline void *kstack_top(struct proc *p) {
-    return (char *)p + 4096 - sizeof(struct trapframe);
+    return (char *)p + PAGE_SIZE;
 }
 
 extern struct proc *current_proc;
 
 void         context_switch(struct switch_context *old, struct switch_context *new);
+void         proc_init(void);
 struct proc *proc_alloc(void (*fn)(void));
 void         proc_exit(void);
 void         yield(void);
