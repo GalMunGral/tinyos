@@ -5,15 +5,7 @@
 #include "vm.h"
 #include "proc.h"
 
-static void proc_a(void) {
-    for (;;)
-        kprintf("A\n");
-}
-
-static void proc_b(void) {
-    for (;;)
-        kprintf("B\n");
-}
+extern void user_print_loop(void);
 
 void kmain(void) {
     uart_init();
@@ -23,7 +15,7 @@ void kmain(void) {
     mm_init();
     kprintf("mm ok\n");
     proc_init();
-    proc_alloc(proc_a);
-    proc_alloc(proc_b);
+    for (uint64_t c = 0x20; c <= 0x7E; c++)
+        proc_alloc(user_print_loop, c);
     scheduler();
 }

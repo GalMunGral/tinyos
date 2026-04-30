@@ -5,7 +5,9 @@
 #include "vm.h"
 #include "trap.h"
 
-#define NPROC 8
+#define NPROC         128
+#define USER_CODE_VA  0x1000UL   // user code mapped here
+#define USER_STACK_VA 0x3000UL   // user stack page; sp starts at top (0x4000)
 
 struct switch_context {
     uint64_t ra, sp;
@@ -29,7 +31,7 @@ extern struct proc *current_proc;
 
 void         context_switch(struct switch_context *old, struct switch_context *new);
 void         proc_init(void);
-struct proc *proc_alloc(void (*fn)(void));
+struct proc *proc_alloc(void *entry, uint64_t arg);
 void         proc_exit(void);
 void         yield(void);
 void         scheduler(void);
