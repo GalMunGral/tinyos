@@ -2,30 +2,13 @@
 #include "proc.h"
 #include "syscall.h"
 #include "kprintf.h"
+#include "csr.h"
 
 #define SCAUSE_INTR   (1UL << 63)
 #define CAUSE_TIMER   5
 #define CAUSE_ECALL_U 8
 
 #define TIMER_INTERVAL 1000000  // 100ms at 10MHz QEMU clock
-
-static uint64_t r_scause(void) {
-    uint64_t x;
-    __asm__ volatile("csrr %0, scause" : "=r"(x));
-    return x;
-}
-
-static uint64_t r_stval(void) {
-    uint64_t x;
-    __asm__ volatile("csrr %0, stval" : "=r"(x));
-    return x;
-}
-
-static uint64_t r_time(void) {
-    uint64_t x;
-    __asm__ volatile("csrr %0, time" : "=r"(x));
-    return x;
-}
 
 static void timer_ack(void) {
     uint64_t t = r_time() + TIMER_INTERVAL;

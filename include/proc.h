@@ -14,13 +14,14 @@ struct switch_context {
     uint64_t s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11;
 };
 
-enum proc_state { RUNNABLE, EXITED };
+enum proc_state { RUNNABLE, SLEEPING, EXITED };
 
 struct proc {
     enum proc_state       state;
     uint64_t              satp;
     pte_t                *pagetable;
     struct switch_context ctx;
+    uint64_t              wake_time;  // mtime value at which to wake (only valid when SLEEPING)
 };
 
 static inline void *kstack_top(struct proc *p) {

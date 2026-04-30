@@ -2,6 +2,7 @@
 #include "mm.h"
 #include "vm.h"
 #include "mem.h"
+#include "csr.h"
 #include "kprintf.h"
 
 struct proc *procs[NPROC];
@@ -87,7 +88,10 @@ static void proc_free(int i) {
 void scheduler(void) {
     for (;;) {
         for (int i = 0; i < NPROC; i++) {
-            if (!procs[i] || procs[i]->state != RUNNABLE) continue;
+            if (!procs[i]) continue;
+            if (procs[i]->state == SLEEPING && r_time() >= procs[i]->wake_time)
+                procs[i]->state = RUNNABLE;
+            if (procs[i]->state != RUNNABLE) continue;
             current_proc = procs[i];
             w_satp(current_proc->satp);
             sfence_vma();
