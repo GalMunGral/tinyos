@@ -99,6 +99,7 @@ set(QEMU_BASE
     -m 128M
     -drive file=${DISK_IMG},format=raw,if=none,id=hd0
     -device virtio-blk-device,drive=hd0,bus=virtio-mmio-bus.0
+    -global virtio-mmio.force-legacy=false
 )
 
 add_custom_target(qemu

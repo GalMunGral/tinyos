@@ -12,7 +12,9 @@
 
 static void timer_ack(void) {
     uint64_t t = r_time() + TIMER_INTERVAL;
-    __asm__ volatile("csrw stimecmp, %0" :: "r"(t));
+    register uint64_t a0 __asm__("a0") = t;
+    register uint64_t a7 __asm__("a7") = 0;  // SBI_SET_TIMER
+    __asm__ volatile("ecall" :: "r"(a0), "r"(a7));
 }
 
 static void handle_interrupt(uint64_t code) {
