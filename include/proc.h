@@ -32,7 +32,7 @@ extern struct proc *current_proc;
 
 void         context_switch(struct switch_context *old, struct switch_context *new);
 void         proc_init(void);
-struct proc *proc_alloc(void *entry, uint64_t arg);
+struct proc *proc_alloc(const char *name, uint64_t arg);
 void         proc_exit(void);
 void         yield(void);
 void         scheduler(void);

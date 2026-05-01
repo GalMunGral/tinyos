@@ -1,9 +1,10 @@
 #include "proc.h"
 #include "mm.h"
 #include "vm.h"
-#include "mem.h"
+#include "util.h"
 #include "csr.h"
 #include "kprintf.h"
+#include "elf.h"
 
 struct proc *procs[NPROC];
 struct proc *current_proc;
@@ -24,15 +25,6 @@ static pte_t *setup_pagetable(void) {
     return pt;
 }
 
-static void load_exec(pte_t *pt, void *entry) {
-    // copy into a fresh page so uvm_free can free all user pages uniformly
-    // ELF loader replaces this: allocate pages per segment, copy from ELF data
-    void *page = alloc_page();
-    if (!page) kpanic("load_exec: out of memory\n");
-    memcpy(page, entry, PAGE_SIZE);
-    map_page(pt, USER_CODE_VA, kva2pa(page), PTE_R | PTE_X | PTE_U);
-}
-
 static uint64_t alloc_stack(pte_t *pt) {
     void *stack = alloc_page();
     if (!stack) kpanic("alloc_stack: out of memory\n");
@@ -40,7 +32,7 @@ static uint64_t alloc_stack(pte_t *pt) {
     return USER_STACK_VA + PAGE_SIZE;
 }
 
-struct proc *proc_alloc(void *entry, uint64_t arg) {
+struct proc *proc_alloc(const char *name, uint64_t arg) {
     void *page = alloc_page();
     if (!page) kpanic("proc_alloc: out of memory\n");
 
@@ -49,13 +41,13 @@ struct proc *proc_alloc(void *entry, uint64_t arg) {
     p->ctx.ra    = (uint64_t)proc_entry;
     p->ctx.sp    = (uint64_t)kstack_top(p) - sizeof(struct trapframe);
 
-    p->pagetable = setup_pagetable();
-    load_exec(p->pagetable, entry);
+    p->pagetable  = setup_pagetable();
+    uint64_t entry = elf_load(p, name);
     uint64_t user_sp = alloc_stack(p->pagetable);
     p->satp = pt2satp(p->pagetable);
 
     struct trapframe *tf = (struct trapframe *)p->ctx.sp;
-    tf->epc = USER_CODE_VA;
+    tf->epc = entry;
     tf->sp  = user_sp;
     tf->a0  = arg;
 

@@ -1,5 +1,5 @@
-#include "syscall.h"
 #include "trap.h"
+#include "syscall.h"
 #include "proc.h"
 #include "csr.h"
 #include "kprintf.h"
@@ -22,6 +22,9 @@ void syscall_dispatch(struct trapframe *tf) {
         break;
     case SYSCALL_SLEEP:
         sys_sleep(tf);
+        break;
+    case SYSCALL_EXIT:
+        proc_exit();
         break;
     default:
         kpanic("unknown syscall: a7=%x\n", tf->a7);

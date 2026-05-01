@@ -4,8 +4,8 @@
 #include "mm.h"
 #include "vm.h"
 #include "proc.h"
-
-extern void user_print_loop(void);
+#include "virtio_blk.h"
+#include "fs.h"
 
 void kmain(void) {
     uart_init();
@@ -15,7 +15,9 @@ void kmain(void) {
     mm_init();
     kprintf("mm ok\n");
     proc_init();
+    virtio_blk_init();
+    fs_init();
     for (uint64_t c = 0x20; c <= 0x7E; c++)
-        proc_alloc(user_print_loop, c);
+        proc_alloc("hello", c);
     scheduler();
 }
