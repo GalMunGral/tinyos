@@ -2,10 +2,18 @@
 #include "syscall.h"
 #include "proc.h"
 #include "csr.h"
+#include "uart.h"
 #include "kprintf.h"
 
-static void sys_putchar(struct trapframe *tf) {
-    kprintf("%c", (char)tf->a0);
+static void sys_write(struct trapframe *tf) {
+    const char *buf = (const char *)tf->a0;
+    uint32_t len = (uint32_t)tf->a1;
+    for (uint32_t i = 0; i < len; i++)
+        uart_putc(buf[i]);
+}
+
+static void sys_printf(struct trapframe *tf) {
+    kprintf((const char *)tf->a0, tf->a1, tf->a2, tf->a3, tf->a4);
 }
 
 static void sys_sleep(struct trapframe *tf) {
@@ -17,8 +25,11 @@ static void sys_sleep(struct trapframe *tf) {
 void syscall_dispatch(struct trapframe *tf) {
     tf->epc += 4;
     switch (tf->a7) {
-    case SYSCALL_PUTCHAR:
-        sys_putchar(tf);
+    case SYSCALL_WRITE:
+        sys_write(tf);
+        break;
+    case SYSCALL_PRINTF:
+        sys_printf(tf);
         break;
     case SYSCALL_SLEEP:
         sys_sleep(tf);

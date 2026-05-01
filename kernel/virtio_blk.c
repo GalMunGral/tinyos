@@ -1,5 +1,5 @@
 #include "virtio_blk.h"
-#include "mm.h"
+#include "mem.h"
 #include "vm.h"
 #include "kprintf.h"
 

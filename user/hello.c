@@ -1,8 +1,8 @@
 #include "lib.h"
 
-void main(long c) {
+void main(long pid, long c) {
     for (;;) {
-        putchar(c);
-        sleep(100);
+        printf("[process (%d)]: %c ", pid, (char)c);
+        sleep(100 * c);
     }
 }

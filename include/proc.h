@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types.h"
-#include "mm.h"
+#include "mem.h"
 #include "vm.h"
 #include "trap.h"
 

@@ -1,6 +1,6 @@
 #include "elf.h"
 #include "fs.h"
-#include "mm.h"
+#include "mem.h"
 #include "util.h"
 #include "kprintf.h"
 

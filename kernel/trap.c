@@ -54,5 +54,6 @@ void trap_init(void) {
     __asm__ volatile("csrw stvec, %0"  :: "r"(kernel_trap_entry));
     __asm__ volatile("csrs sie, %0"    :: "r"(1 << 5));
     timer_ack();
-    __asm__ volatile("csrs sstatus, %0" :: "r"(1 << 1));
+    __asm__ volatile("csrs sstatus, %0" :: "r"(1 << 1));   // SIE
+    __asm__ volatile("csrs sstatus, %0" :: "r"(1 << 18));  // SUM: allow kernel to access user pages
 }

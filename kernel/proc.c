@@ -1,5 +1,5 @@
 #include "proc.h"
-#include "mm.h"
+#include "mem.h"
 #include "vm.h"
 #include "util.h"
 #include "csr.h"
@@ -49,10 +49,11 @@ struct proc *proc_alloc(const char *name, uint64_t arg) {
     struct trapframe *tf = (struct trapframe *)p->ctx.sp;
     tf->epc = entry;
     tf->sp  = user_sp;
-    tf->a0  = arg;
+    tf->a1  = arg;
 
     for (int i = 0; i < NPROC; i++) {
         if (!procs[i]) {
+            tf->a0  = i;
             procs[i] = p;
             return p;
         }

@@ -1,5 +1,5 @@
 #include "vm.h"
-#include "mm.h"
+#include "mem.h"
 #include "kprintf.h"
 
 static void zero_page(void *p) {
